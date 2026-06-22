@@ -1,33 +1,31 @@
-function insertCumulativeLapTime(): void {
-  const timeSection = Array.from(document.querySelectorAll("div.main")).find(
-    (el) => el.textContent?.trim() === "タイム"
-  );
-  if (!timeSection) return;
+import { ResultPageParser } from "./ResultPageParser";
 
-  const table = timeSection.closest("table");
-  if (!table) return;
-
-  const rows = Array.from(table.querySelectorAll("tr"));
-  const lapRow = rows.find((row) => row.cells[0]?.textContent?.trim() === "ハロンタイム");
+function insertRows(): void {
+  const parser = new ResultPageParser();
+  const lapRow = parser.getLapRow();
   if (!lapRow) return;
 
-  const lapText = lapRow.cells[1]?.textContent?.trim() ?? "";
-  const laps = lapText.split("-").map((s) => parseFloat(s.trim()));
-  if (laps.some(isNaN)) return;
+  const cumulative = parser.getCumulative();
+  if (cumulative.length === 0) return;
 
-  const cumulative = laps.reduce<number[]>((acc, lap) => {
-    const prev = acc[acc.length - 1] ?? 0;
-    return [...acc, Math.round((prev + lap) * 10) / 10];
-  }, []);
-
-  const newRow = document.createElement("tr");
-  newRow.innerHTML = `
+  const cumulativeRow = document.createElement("tr");
+  cumulativeRow.className = lapRow.className;
+  cumulativeRow.innerHTML = `
     <th scope="row">累計タイム</th>
     <td>${cumulative.map((t) => t.toFixed(1)).join(" - ")}</td>
   `;
-  newRow.className = lapRow.className;
+  lapRow.insertAdjacentElement("afterend", cumulativeRow);
 
-  lapRow.insertAdjacentElement("afterend", newRow);
+  const start3F = parser.getStart3F();
+  if (start3F !== null) {
+    const start3FRow = document.createElement("tr");
+    start3FRow.className = lapRow.className;
+    start3FRow.innerHTML = `
+      <th scope="row">テン3F</th>
+      <td>${start3F.toFixed(1)}</td>
+    `;
+    cumulativeRow.insertAdjacentElement("afterend", start3FRow);
+  }
 }
 
-insertCumulativeLapTime();
+insertRows();
