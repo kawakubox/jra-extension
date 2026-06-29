@@ -1,4 +1,5 @@
 import { ResultPageParser } from "./ResultPageParser";
+import { colorizeBloodlines } from "./PedigreeColorizer";
 
 function insertRows(): void {
   const parser = new ResultPageParser();
@@ -29,3 +30,4 @@ function insertRows(): void {
 }
 
 insertRows();
+colorizeBloodlines();
