@@ -1,0 +1,35 @@
+name: Update cushion values
+
+on:
+  schedule:
+    - cron: "30 0 * * 0,6" # 土日 9:30 JST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+
+      - run: npm run update-cushion
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- data/cushion.tsv; then
+            echo "No changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/cushion.tsv
+          git commit -m "chore: クッション値を更新"
+          git push
