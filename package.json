@@ -7,7 +7,8 @@
     "dev": "vite build --watch",
     "build": "vite build",
     "preview": "vite build && echo 'Load dist/ folder in Chrome'",
-    "update-cushion": "node scripts/update-cushion.mjs"
+    "update-cushion": "node scripts/update-cushion.mjs",
+    "update-moist": "node scripts/update-moist.mjs"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.320",
